@@ -13,10 +13,62 @@ Build and test your three tools in `tools.py` first. Then come here.
     python agent.py          runs both example paths below
 """
 
+import re
 import config
 import trace
 from tools import search_listings, suggest_outfit, create_fit_card
 from generate import ModelUnavailable
+
+
+def parse_query(query: str) -> dict:
+    """
+    Parse the query into a description, a size, and a max_price.
+
+    Uses regex to extract price ceilings and size specifications,
+    cleaning remaining text to serve as the search description.
+    """
+    max_price = None
+    size = None
+
+    # Price pattern: e.g. "under $30", "below 30", "max $50", "$30"
+    price_pattern = (
+        r'(?:(?:under|below|less than|max(?:imum)?(?:\s+price)?|up to|at most)\s*\$?\s*(\d+(?:\.\d+)?))'
+        r'|(?:\$\s*(\d+(?:\.\d+)?))'
+    )
+    price_match = re.search(price_pattern, query, re.IGNORECASE)
+    if price_match:
+        price_val = price_match.group(1) or price_match.group(2)
+        max_price = float(price_val)
+
+    # Size pattern: e.g. "size M", "size: M", "size 8", "in size M", "size XXS"
+    size_pattern = r'\b(?:in\s+)?size[:\s]+([a-zA-Z0-9/]+)\b'
+    size_match = re.search(size_pattern, query, re.IGNORECASE)
+    if size_match:
+        size = size_match.group(1).strip()
+
+    # Clean description by removing price and size mentions
+    desc = query
+    if price_match:
+        desc = desc.replace(price_match.group(0), " ")
+    if size_match:
+        desc = desc.replace(size_match.group(0), " ")
+
+    # Remove common conversational prefixes and normalize whitespace/punctuation
+    desc = re.sub(
+        r'^(?:i(?:\'m| am)?\s+)?(?:looking for|search(?:ing)? for|find(?: me)?)\s+(?:a|an)?\s*',
+        '',
+        desc,
+        flags=re.IGNORECASE,
+    )
+    desc = re.sub(r'\s+', ' ', desc).strip(' ,.-')
+    if not desc:
+        desc = query.strip()
+
+    return {
+        "description": desc,
+        "size": size,
+        "max_price": max_price,
+    }
 
 
 # ── session state ─────────────────────────────────────────────────────────────
@@ -105,10 +157,77 @@ def run_agent(query: str, wardrobe: dict) -> dict:
       • A handler for ModelUnavailable, so a bad key produces a message rather
         than a stack trace. The import is already at the top of this file.
     """
+    # 1. Start a session with new_session().
     session = new_session(query, wardrobe)
 
-    # TODO: delete these two lines and build the loop.
-    session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
+    # 2. Count the times round the loop, and call trace.check_iterations(count)
+    #    on each one before you go again. It raises when the count passes
+    #    MAX_ITERATIONS in config.py — see trace.py.
+    iteration_count = 1
+    trace.check_iterations(iteration_count)
+
+    # 3. Parse the query into a description, a size, and a max_price. Regex,
+    #    string splitting, or asking the model are all fine — say which you
+    #    chose in your README. Put the result in session["parsed"].
+    parsed = parse_query(query)
+    session["parsed"] = parsed
+
+    # 4. Call search_listings() with what you parsed.
+    #    Put the results in session["search_results"].
+    results = search_listings(
+        description=parsed["description"],
+        size=parsed["size"],
+        max_price=parsed["max_price"],
+    )
+    session["search_results"] = results
+
+    # ⚠️ THIS IS THE BRANCH. If nothing came back:
+    #      - put a message in session["error"] saying what the user could
+    #        change — "No results" is not that message
+    #      - return the session
+    #      - do NOT call suggest_outfit with nothing
+    if not results:
+        suggestions = []
+        if parsed.get("max_price") is not None:
+            suggestions.append(f"raising your budget above ${parsed['max_price']:g}")
+        if parsed.get("size"):
+            suggestions.append(f"checking other sizes instead of {parsed['size']}")
+        suggestions.append("broadening your search terms")
+
+        if len(suggestions) == 1:
+            tips = suggestions[0]
+        elif len(suggestions) == 2:
+            tips = f"{suggestions[0]} or {suggestions[1]}"
+        else:
+            tips = f"{', '.join(suggestions[:-1])}, or {suggestions[-1]}"
+
+        session["error"] = (
+            f"No listings found matching '{parsed.get('description', query)}'. "
+            f"Try {tips}."
+        )
+        return session
+
+    # 5. Choose an item — the first result is fine. Put it in
+    #    session["selected_item"].
+    session["selected_item"] = results[0]
+
+    try:
+        # 6. Call suggest_outfit() with the selected item and the wardrobe.
+        #    Put the result in session["outfit_suggestion"].
+        session["outfit_suggestion"] = suggest_outfit(
+            session["selected_item"], session["wardrobe"]
+        )
+
+        # 7. Call create_fit_card() with the outfit and the item.
+        #    Put the result in session["fit_card"].
+        session["fit_card"] = create_fit_card(
+            session["outfit_suggestion"], session["selected_item"]
+        )
+    except ModelUnavailable as exc:
+        session["error"] = f"Model unavailable: {exc}"
+        return session
+
+    # 8. Return the session.
     return session
 
 
