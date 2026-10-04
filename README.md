@@ -125,6 +125,40 @@ Regex. Regular expressions extract price ceilings (e.g., `under $30`, `max $50`)
 
 ```
 $ python app.py ask '...'
+$ python app.py ask 'jeans'
+
+  Found:    Baggy Carpenter Jeans — Dark Wash — $36.0 on depop
+
+  Outfit:   Hey! As your FitFindr stylist, I am *so* on board with you thrifting these baggy carpenter jeans. 90s workwear is having a massive moment, and that hammer loop detail adds instant street-cred. 
+
+Since you already have an incredible foundation of streetwear basics and grunge staples in your closet, you can style these right away. Here are two distinct outfit combinations using pieces you already own:
+
+### Look 1: The 90s Off-Duty Model (Casual Streetwear)
+*   **Top:** White ribbed tank top
+*   **Outerwear:** Vintage black denim jacket
+*   **Shoes:** Chunky white sneakers
+*   **Accessories:** Black crossbody bag
+
+**Why it works:** 
+*   **Silhouette Balance:** The baggy, low-to-mid waist fit of the carpenter jeans creates a classic skater/90s silhouette. Pairing them with a fitted, ribbed white tank top creates an effortless high-contrast balance between tight and loose. 
+*   **Aesthetic & Color:** Throwing on the vintage black denim jacket over top leans into the double-denim trend without being matchy-matchy (indigo blue meets washed black). The chunky white sneakers tie in with the crisp white tank, grounding the whole streetwear vibe.
+
+---
+
+### Look 2: Grungy Utilitarian (Cozy & Edgy)
+*   **Top:** Oversized grey crewneck sweatshirt
+*   **Shoes:** Black combat boots
+*   **Accessories:** Brown leather belt, Black crossbody bag
+
+**Why it works:**
+*   **Proportions & Vibe:** This leans heavily into the workwear and grunge aesthetic. Tucking a corner of the oversized grey crewneck into the waistband (and letting the brown leather belt peek out) defines your waist while keeping the top comfortably slouchy to match the volume of the pants.
+*   **Color Harmony:** The cool charcoal grey of the sweatshirt complements the deep indigo dark wash of the carpenter jeans, while the black combat boots add a tough, grounded finish that plays offthe utilitarian hammer loop on the pants. 
+
+**Stylist Verdict:** *Buy them!* They’ll easily integrate into your current rotation and give you that effortless, slouchy aesthetic.
+
+  Fit card: Scored these vintage Baggy Carpenter Jeans — Dark Wash on Depop for just $36.00, and I am officially obsessed with the 90s workwear energy! Whether I'm pairing them with a sleek ribbed tank and chunky sneakers for that off-duty model look or leaning into grunge with an oversized crewneck and combat boots, that hammer loop detail adds instant street-cred. 🛠️✨
+
+2 model calls this session, 1007 prompt + 552 output tokens
 
 ```
 

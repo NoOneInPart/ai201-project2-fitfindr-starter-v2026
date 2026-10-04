@@ -323,15 +323,16 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
     price_str = f"${price:.2f}" if price is not None else "thrift price"
 
     prompt = (
-        "Write a short, authentic social media caption (2 to 4 sentences) showcasing a thrift find.\n\n"
+        "Write an engaging social media caption (2 to 4 sentences) for an OOTD / thrift find share.\n\n"
+        "Channel peak Instagram OOTD / Thrift-Tok energy with authentic enthusiasm and a couple of fitting emojis ✨.\n\n"
         f"Item: {title}\n"
         f"Price: {price_str}\n"
         f"Platform: {platform}\n\n"
         f"Outfit and styling:\n{outfit.strip()}\n\n"
         "Requirements:\n"
-        "- Write exactly 2 to 4 sentences in a natural, conversational voice (like someone posting on Instagram or TikTok, not a dry sales description).\n"
+        "- Write exactly 2 to 4 sentences.\n"
         f"- Explicitly mention the item ('{title}'), its price ('{price_str}'), and the platform ('{platform}') once each.\n"
-        "- Be specific about the aesthetic vibe and how the pieces come together.\n"
+        "- Capture the aesthetic vibe and how the outfit pieces come together.\n"
         "- Return only the caption text."
     )
 
