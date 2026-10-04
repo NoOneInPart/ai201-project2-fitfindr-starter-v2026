@@ -64,7 +64,7 @@
                description (str), size (str or None), max_price (float or None)
 - **Returns:** list (dict) of matching items (id, title, description, category, style_tags [list], size,
         condition, price [float], colors [list], brand [str or None], platform), best match first
-- **When it has nothing:** return an empty list, branching point
+- **When it has nothing:** BRANCHING POINT: search_listings returns an empty list, the agent places an error in the session. otherwise call suggest_outfit
 
 ### `suggest_outfit`
 
