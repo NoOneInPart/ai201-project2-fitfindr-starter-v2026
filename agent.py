@@ -189,7 +189,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     if not results:
         suggestions = []
         if parsed.get("max_price") is not None:
-            suggestions.append(f"raising your budget above ${parsed['max_price']:g}")
+            suggestions.append(f"adjusting or removing your price limit (currently ${parsed['max_price']:g})")
         if parsed.get("size"):
             suggestions.append(f"checking other sizes instead of {parsed['size']}")
         suggestions.append("broadening your search terms")
