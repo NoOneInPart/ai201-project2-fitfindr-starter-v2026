@@ -175,7 +175,7 @@ $ python -c "from tools import suggest_outfit; ..."
 $ python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
 Hey there! As your FitFindr stylist, I am *so* on board with you grabbing these vintage Levi’s 501s. A good medium-wash 501 is the ultimate wardrobe holy grail—they truly go with everything. 
 
-```
+
 Since you already have a killer mix of streetwear basics, minimal pieces, and edgy footwear, here are two effortless outfit combinations you can build using your current wardrobe:
 
 ### Look 1: The 90s Off-Duty Streetwear Vibe
@@ -192,9 +192,9 @@ Since you already have a killer mix of streetwear basics, minimal pieces, and ed
 
 **Stylist Verdict:** Definitely add these to your cart! They’re going to slot right into your rotation and give you so much styling versatility.
 ```
-$ python -c "from tools import create_fit_card; ..."
 
 ```
+$ python -c "from tools import create_fit_card; ..."
 $ python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
 Nothing beats the effortless 90s off-duty model vibe of these Vintage Levi's 501 Jeans in a perfect medium wash. I love pairing them with crisp white sneakers for that ultimate casual, everyday look that just works. Snag this holy grail piece over on my depop for just $38.00 before someone else grabs them!
 ```
