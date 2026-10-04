@@ -28,6 +28,7 @@ tool calls and returns a fit card — in at least 4 of 5 tries.
 <!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
      "my search is a plain keyword match and some phrasings will miss" is a
      real answer. -->
+The search tool works by finding keyword matches in the description as well as direct size and price matches. It should work reliably as the codepath is deterministic, however, a natural input is not deterministic and may not always yield exact matches if the search description doesn't nicely match that of the intended listing, so 4 out of 5 allows some leeway for this possibility.
 
 ---
 
@@ -39,6 +40,7 @@ Given a query that matches no listings, the agent stops before calling
 **Why this target:**
 <!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
      about this path? -->
+The query is specifically designed to be nowhere close to the existing listings, and the search tool consists of deterministic codes that checks for keyword matches and exact price/size matches. It should not be able to return something if nothing is supposed to match, thus, this criteria must be met for 5 of 5 tries.
 
 ---
 
@@ -54,9 +56,11 @@ Given a query that matches no listings, the agent stops before calling
      compares session["selected_item"] against what actually reached
      suggest_outfit is the shape you're after. -->
 
+session["selected_item"]["id"] should match session["search_results"][0]["id"], and all original listing fields (id, title, price, platform, size) are intact for all 5 of 5 tries.
 
 
 **Why this target:**
+5 out of 5 should be realistic because passing the data along should be accomplished through deterministic code and not a non-deterministic LLM; if there's a problem with the information not being the same, there is a bug.
 
 
 
@@ -75,10 +79,10 @@ Given a query that matches no listings, the agent stops before calling
      sentence? A card longer than a caption anyone would post? Any of those can
      be turned into a number. -->
 
-
+Fit card captions explicitly include both the platform name and item price in 4 of 5 runs.
 
 **Why this target:**
-
+Tool prompts should explicitly instruct the model to include both the platform name and item price in the returned result, but due to the non-deterministic nature of LLMs, 4 out of 5 allows the small models used to accidentally drop one or more of these parts since it isn't explicitly a problem with the code.
 
 
 ---
@@ -92,10 +96,10 @@ Given a query that matches no listings, the agent stops before calling
      search respects a price ceiling — anything, as long as it names a number
      or an observable outcome. -->
 
-
+For a valid query but an empty wardrobe, the agent should successfully complete the run and return a fit card with general styling advice without breaking for 5 of 5 runs.
 
 **Why this target:**
-
+5 of 5 should be realistic as that part can be handled deterministically in suggest_outfit, specifically prompting the model to give some styling advice with an empty wardrobe versus prompting the model to find suggested outfits if there is a wardrobe.
 
 
 ---
