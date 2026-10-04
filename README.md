@@ -125,16 +125,36 @@ $ python app.py ask '...'
 ```
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
 
+[{'id': 'lst_006', 'title': 'Graphic Tee — 2003 Tour Bootleg Style', 'description': 'Vintage-style bootleg tee with faded graphic. Slightly boxy fit. 100% cotton, soft and worn-in.', 'category': 'tops', 'style_tags': ['graphic tee', 'vintage', 'grunge', 'streetwear', 'band tee'], 'size': 'L', 'condition': 'good', 'price': 24.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.', 'category': 'tops', 'style_tags': ['y2k', 'vintage', 'graphic tee', 'cottagecore'], 'size': 'S/M', 'condition': 'excellent', 'price': 18.0, 'colors': ['white', 'pink', 'purple'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_033', 'title': 'Vintage Band Tee — Faded Grey', 'description': 'Faded grey band-style tee with distressed graphic. Crew neck. Fits boxy. Well-loved but no holes or major damage.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'band tee', 'graphic tee', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 19.0, 'colors': ['grey', 'charcoal'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_015', 'title': 'Vintage Graphic Hoodie — Faded Black', 'description': 'Faded black pullover hoodie with barely-visible vintage graphic on the chest. Cozy interior. Some pilling but adds to the worn-in look.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'graphic', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 26.0, 'colors': ['black', 'charcoal'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_017', 'title': 'Mesh Long-Sleeve Top — Black', 'description': 'Sheer black mesh long-sleeve. Great for layering under a graphic tee or over a bralette. Stretchy material, fits true to size.', 'category': 'tops', 'style_tags': ['y2k', 'grunge', 'goth', 'layering'], 'size': 'S/M', 'condition': 'excellent', 'price': 15.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_011', 'title': 'Low-Rise Cargo Pants — Khaki', 'description': 'Y2K era low-rise cargo pants. Lots of pockets. Khaki color, slightly distressed at the hems. Great for layering with a long tee.', 'category': 'bottoms', 'style_tags': ['y2k', 'cargo', '2000s', 'streetwear'], 'size': 'W29', 'condition': 'fair', 'price': 27.0, 'colors': ['khaki', 'tan'], 'brand': None, 'platform': 'poshmark'}]
 ```
 
 ```
 $ python -c "from tools import suggest_outfit; ..."
+$ python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
+Hey there! As your FitFindr stylist, I am *so* on board with you grabbing these vintage Levi’s 501s. A good medium-wash 501 is the ultimate wardrobe holy grail—they truly go with everything. 
 
 ```
+Since you already have a killer mix of streetwear basics, minimal pieces, and edgy footwear, here are two effortless outfit combinations you can build using your current wardrobe:
 
+### Look 1: The 90s Off-Duty Streetwear Vibe
+* **The Recipe:** Vintage Levi’s 501 Jeans + White ribbed tank top + Black cropped zip hoodie + Chunky white sneakers + Black crossbody bag.
+* **Why it works:** 
+  * **Silhouette:** The fitted white tank balances out the straight-leg cut of the 501s, while layering the black cropped zip hoodie on top creates a cool, dimensional streetwear proportion. 
+  * **Color Harmony:** Classic blue denim, crisp white, and black is a timeless, foolproof color palette. The chunky white sneakers tie back to the white tank for a cohesive, intentional finish.
+
+### Look 2: Edgy Grunge-Classic
+* **The Recipe:** Vintage Levi’s 501 Jeans + Oversized grey crewneck sweatshirt + Brown leather belt + Black combat boots + Vintage black denim jacket.
+* **Why it works:**
+  * **Aesthetic Vibe:** This leans into a textured, effortlessly cool grunge-meets-vintage aesthetic. Tucking the oversized grey crewneck into the 501s and cinching it with the brown leather belt adds a touch of structure.
+  * **Silhouette & Contrast:** Pairing the structured medium-wash denim with the heavier black combat boots grounds the look, and throwing on the black denim jacket creates an awesome "denim-on-denim" moment with the black-and-blue contrast. 
+
+**Stylist Verdict:** Definitely add these to your cart! They’re going to slot right into your rotation and give you so much styling versatility.
 ```
 $ python -c "from tools import create_fit_card; ..."
 
+```
+$ python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
+Nothing beats the effortless 90s off-duty model vibe of these Vintage Levi's 501 Jeans in a perfect medium wash. I love pairing them with crisp white sneakers for that ultimate casual, everyday look that just works. Snag this holy grail piece over on my depop for just $38.00 before someone else grabs them!
 ```
 
 ---
