@@ -41,7 +41,7 @@
 
 <!-- Three or four sentences: what a user asks for, and what they get back. -->
 
-
+FitFindr is a command-line thrift shopping and styling assistant. Users enter what they are looking for in plain English, optionally specifying a preferred size or price limit (such as `'vintage graphic tee under $30'`). The assistant searches secondhand listings to find the best match and suggests styled outfit combinations by pairing the find with items the user already owns in their wardrobe. Finally, it writes a short social media caption (a "fit card") highlighting the piece, its price, where to buy it, and its overall aesthetic vibe.
 
 ---
 
@@ -96,13 +96,21 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:** If `search_listings` returns an empty list, put a helpful message in `session["error"]` explaining what the user could adjust (raising the price ceiling, checking different sizes, or broadening search terms) and stop without calling `suggest_outfit`. Otherwise, assign the first match (`search_results[0]`) to `session["selected_item"]` and proceed to `suggest_outfit`.
 
 **Where it lives:** `agent.py::run_agent`
 
 **How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+Regex. Regular expressions extract price ceilings (e.g., `under $30`, `max $50`) into `max_price: float` and size specifications (e.g., `size M`, `in size M`, `size 8`) into `size: str`. Conversational filler phrases (e.g., `looking for a`, `find me`) and the matched price/size clauses are stripped, leaving the core item keywords in `description: str`.
 
 **What moves through the session:** <!-- which fields, in what order -->
+1. `query` and `wardrobe` (initialized by `new_session`)
+2. `parsed` (stores extracted `description`, `size`, and `max_price`)
+3. `search_results` (stores list of matching listing dicts from `search_listings`)
+4. `error` (set with actionable guidance if `search_results` is empty, ending the run)
+5. `selected_item` (stores the top match `search_results[0]` for styling)
+6. `outfit_suggestion` (stores output string from `suggest_outfit`)
+7. `fit_card` (stores final social media caption string from `create_fit_card`)
 
 ---
 
@@ -170,15 +178,15 @@ Nothing beats the effortless 90s off-duty model vibe of these Vintage Levi's 501
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* Help writing the agent loop
+- *What came back:* A surprisingly well-documented agent loop
+- *What I changed:* I changed the suggestion for if there are no results since "raising your budget" isn't always going to get you more results.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* Help with writing my criteria to be measureable
+- *What came back:* A highly technical sounding version of my criteria that is more measureable
+- *What I changed:* I rewrote it in my own words
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
