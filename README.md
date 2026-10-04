@@ -59,24 +59,27 @@
 
 ### `search_listings`
 
-- **What it does:**
+- **What it does:** Look for listings with a matching description/size/max_price and return them as a list.
 - **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+               description (str), size (str or None), max_price (float or None)
+- **Returns:** list (dict) of matching items (id, title, description, category, style_tags [list], size,
+        condition, price [float], colors [list], brand [str or None], platform), best match first
+- **When it has nothing:** return an empty list, branching point
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Suggest an outfit (or two) based on a considered item and the user's wardrobe
+- **Inputs:** new_item (dict) (id, title, description, category, style_tags [list], size,
+        condition, price [float], colors [list], brand [str or None], platform), wardrobe (dict) (id, name, category, colors [list], style_tags [list], notes)
+- **Returns:** string with outfit suggestions
+- **When it has nothing:** return string with general styling advice if no wardrobe
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** write a caption about the find like how a social media influencer would write about some random thing they got from a thrift store to hype it up and drive ebay prices up
+- **Inputs:** outfit (str), new_item (dict) (id, title, description, category, style_tags [list], size, condition, price [float], colors [list], brand [str or None], platform)
+- **Returns:** 2-4 sentence string
+- **When it has nothing:** return descriptive message string
 
 ---
 
