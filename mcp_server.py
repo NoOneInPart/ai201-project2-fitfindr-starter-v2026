@@ -69,20 +69,24 @@ mcp = FastMCP("fitfindr", log_level="WARNING")
 
 # ── TODO: uncomment and fill this in ──────────────────────────────────────────
 #
-# @mcp.tool()
-# def search_listings(
-#     description: str,
-#     size: str | None = None,
-#     max_price: float | None = None,
-# ) -> list[dict]:
-#     """
-#     <-- YOUR DESCRIPTION GOES HERE.
-#
-#         One or two sentences. What does this tool do, what does it need, and
-#         what does it give back when it finds nothing? Written for a reader
-#         who cannot see the code.
-#     """
-#     return _search_listings_impl(description, size, max_price)
+@mcp.tool()     #decorator FastMCP
+def search_listings(
+    description: str,
+    size: str | None = None,
+    max_price: float | None = None,
+) -> list[dict]:
+    # docstring as defined by Gemini (by AI for AI, very appropriate! :upside-down_face::thumbs_up:)
+    """
+    Search second-hand clothing listings matching a text query, with optional size and price filters.
+    Args:
+        description: Search keywords or phrases describing the desired item (e.g., 'vintage leather jacket').
+        size: Optional size string filter (e.g., 'M', 'L', '32'). Case-insensitive.
+        max_price: Optional maximum price ceiling in USD (inclusive). Pass None for no limit.
+    Returns:
+        A list of matching listing dictionaries sorted by relevance (best match first),
+        or an empty list [] if no matching items are found.
+    """
+    return _search_listings_impl(description, size, max_price)
 #
 # ──────────────────────────────────────────────────────────────────────────────
 #

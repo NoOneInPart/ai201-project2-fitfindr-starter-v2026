@@ -18,6 +18,7 @@ import config
 import trace
 from tools import search_listings, suggest_outfit, create_fit_card
 from generate import ModelUnavailable
+from mcp_client import call_tool
 
 
 def parse_query(query: str) -> dict:
@@ -164,7 +165,8 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     #    on each one before you go again. It raises when the count passes
     #    MAX_ITERATIONS in config.py — see trace.py.
     iteration_count = 1
-    trace.check_iterations(iteration_count)
+    #type: ignore so VSC doesn't warn me about a function that exists
+    trace.check_iterations(iteration_count) #type: ignore
 
     # 3. Parse the query into a description, a size, and a max_price. Regex,
     #    string splitting, or asking the model are all fine — say which you
@@ -174,10 +176,10 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
     # 4. Call search_listings() with what you parsed.
     #    Put the results in session["search_results"].
-    results = search_listings(
-        description=parsed["description"],
-        size=parsed["size"],
-        max_price=parsed["max_price"],
+    results = call_tool("search_listings", {
+        "description": parsed["description"],
+        "size": parsed["size"],
+        "max_price": parsed["max_price"], }
     )
     session["search_results"] = results
 
@@ -215,13 +217,13 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         # 6. Call suggest_outfit() with the selected item and the wardrobe.
         #    Put the result in session["outfit_suggestion"].
         session["outfit_suggestion"] = suggest_outfit(
-            session["selected_item"], session["wardrobe"]
+            session["selected_item"], session["wardrobe"]   #type: ignore
         )
 
         # 7. Call create_fit_card() with the outfit and the item.
         #    Put the result in session["fit_card"].
         session["fit_card"] = create_fit_card(
-            session["outfit_suggestion"], session["selected_item"]
+            session["outfit_suggestion"], session["selected_item"]  #type: ignore
         )
     except ModelUnavailable as exc:
         session["error"] = f"Model unavailable: {exc}"
