@@ -389,14 +389,33 @@ Scored this absolute vintage goldmine on poshmark for just $42.00, and this Deni
 
 **Happy path**
 
-```
-
+```text
+[1] parse_query
+      in:  vintage graphic tee under $30
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey, Y2K Baby Tee — Butterfly Print … +7 more
+      →    branch: found 10 items — selected 'Graphic Tee — 2003 Tour Bootleg Style'
+[3] suggest_outfit
+      in:  dict with keys: item, wardrobe_items
+      out: Hey there! As your FitFindr stylist, I am so excited about this find. A 2003 tour bootleg tee is the holy grai…
+      →    matched with user wardrobe
+[4] create_fit_card
+      in:  dict with keys: item
+      out: Scored the ultimate 2003 tour bootleg style graphic tee for just $24.00 on depop, and I am officially obsessed…
 ```
 
 **Empty search**
 
-```
-
+```text
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+      →    branch: 0 results — stopping early, skipping suggest_outfit and create_fit_card
 ```
 
 **On the MCP move:** <!-- what changed in your code, and whether anything
@@ -404,7 +423,7 @@ behaved differently afterwards. If the rewire didn't work, say exactly where it
 broke — the error text and the last thing that worked. That earns the point in
 full. -->
 
-
+In `mcp_server.py`, I uncommented the `@mcp.tool()` wrapper for `search_listings` (calling `_search_listings_impl` from `tools.py`) and added the tool docstring describing the inputs and empty-list return behavior. In `agent.py`, I swapped the direct `search_listings` call for `call_tool("search_listings", ...)` from `mcp_client.py`. At runtime, the return values and agent behavior were identical; the only change was that Pylance could no longer infer the return type from `call_tool`, so I added `# type: ignore` on the downstream calls using `session["selected_item"]`.
 
 ---
 
