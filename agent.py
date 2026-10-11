@@ -159,6 +159,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         than a stack trace. The import is already at the top of this file.
     """
     # 1. Start a session with new_session().
+    trace.start_trace()  # type: ignore
     session = new_session(query, wardrobe)
 
     # 2. Count the times round the loop, and call trace.check_iterations(count)
@@ -173,6 +174,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     #    chose in your README. Put the result in session["parsed"].
     parsed = parse_query(query)
     session["parsed"] = parsed
+    trace.step("parse_query", inputs=query, returned=parsed)  # type: ignore
 
     # 4. Call search_listings() with what you parsed.
     #    Put the results in session["search_results"].
@@ -189,6 +191,12 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     #      - return the session
     #      - do NOT call suggest_outfit with nothing
     if not results:
+        trace.step(  # type: ignore
+            "search_listings (via MCP)",
+            inputs=parsed,
+            returned=results,
+            note="branch: 0 results — stopping early, skipping suggest_outfit and create_fit_card",
+        )
         suggestions = []
         if parsed.get("max_price") is not None:
             suggestions.append(f"adjusting or removing your price limit (currently ${parsed['max_price']:g})")
@@ -212,12 +220,25 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     # 5. Choose an item — the first result is fine. Put it in
     #    session["selected_item"].
     session["selected_item"] = results[0]
+    trace.step(  # type: ignore
+        "search_listings (via MCP)",
+        inputs=parsed,
+        returned=results,
+        note=f"branch: found {len(results)} items — selected '{results[0].get('title')}'",
+    )
 
     try:
         # 6. Call suggest_outfit() with the selected item and the wardrobe.
         #    Put the result in session["outfit_suggestion"].
+        wardrobe_count = len(wardrobe.get("items", [])) if isinstance(wardrobe, dict) else 0
         session["outfit_suggestion"] = suggest_outfit(
             session["selected_item"], session["wardrobe"]   #type: ignore
+        )
+        trace.step(  # type: ignore
+            "suggest_outfit",
+            inputs={"item": session["selected_item"].get("title"), "wardrobe_items": wardrobe_count},  # type: ignore
+            returned=session["outfit_suggestion"],
+            note="empty wardrobe fallback" if wardrobe_count == 0 else "matched with user wardrobe",
         )
 
         # 7. Call create_fit_card() with the outfit and the item.
@@ -225,8 +246,14 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         session["fit_card"] = create_fit_card(
             session["outfit_suggestion"], session["selected_item"]  #type: ignore
         )
+        trace.step(  # type: ignore
+            "create_fit_card",
+            inputs={"item": session["selected_item"].get("title")},  # type: ignore
+            returned=session["fit_card"],
+        )
     except ModelUnavailable as exc:
         session["error"] = f"Model unavailable: {exc}"
+        trace.step("model_error", note=session["error"])  # type: ignore
         return session
 
     # 8. Return the session.
