@@ -423,7 +423,7 @@ behaved differently afterwards. If the rewire didn't work, say exactly where it
 broke — the error text and the last thing that worked. That earns the point in
 full. -->
 
-In `mcp_server.py`, I uncommented the `@mcp.tool()` wrapper for `search_listings` (calling `_search_listings_impl` from `tools.py`) and added the tool docstring describing the inputs and empty-list return behavior. In `agent.py`, I swapped the direct `search_listings` call for `call_tool("search_listings", ...)` from `mcp_client.py`. At runtime, the return values and agent behavior were identical; the only change was that Pylance could no longer infer the return type from `call_tool`, so I added `# type: ignore` on the downstream calls using `session["selected_item"]`.
+In `mcp_server.py`, I uncommented the `@mcp.tool()` wrapper for `search_listings` (calling `_search_listings_impl` from `tools.py`) and added the tool docstring describing the inputs and empty-list return behavior. In `agent.py`, I swapped the direct `search_listings` call for `call_tool("search_listings", ...)` from `mcp_client.py`. At runtime, the return values and agent behavior were identical; the only change was that Pylance in VSCode could no longer infer the return type from `call_tool`, so I added `# type: ignore` on the downstream calls using `session["selected_item"]`.
 
 ---
 
@@ -436,24 +436,28 @@ In `mcp_server.py`, I uncommented the `@mcp.tool()` wrapper for `search_listings
 
 **What I changed:**
 
+In `tools.py::create_fit_card`, I updated the prompt to enforce an explicit character limit (`"strictly under 240 characters total"`, giving a 40-character safety buffer below the 280-character ceiling implemented by platforms like X) and changed the sentence instruction from `"Write exactly 2 to 4 sentences"` to `"Write 2 short, punchy sentences (highlight just ONE favorite styling vibe rather than summarizing everything)"`.
+
 **Which failure it was meant to fix:**
+
+Criterion 4 (`MISSED 0/5` in the before run), where every generated fit card exceeded the 280-character limit (ranging from 345 to 446 characters, averaging 377.4 characters) because the model was trying to summarize both Look 1 and Look 2 from `suggest_outfit` into 3–4 long sentences without a character budget.
 
 ### Run Log — After
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Matching query completes all three tools | 4/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Impossible query stops before the second tool | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. `session["selected_item"]["id"]` matches `session["search_results"][0]["id"]` with all fields intact | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card includes platform + price and stays ≤ 280 chars (revised) | 4/5 | PASS (158c) | PASS (154c) | PASS (156c) | PASS (145c) | PASS (153c) | MET (5/5) |
+| 5. Empty wardrobe query completes and returns fit card with general styling advice | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
 **Did it help, and how do I know:**
 
 <!-- If it made things worse, say that. Honestly reported, that earns full
      credit and is more interesting than one that worked. -->
 
-
+Yes—Criterion 4 went from **MISSED (0/5)** to **MET (5/5)**. In the `after` evaluation run (`results/run_2026-10-11_1425_after.md`), all 5 fit cards for the matching query included the platform (`depop`) and price (`$24.00`) while dropping from an average of **377.4 characters** (345–446c) down to **153.2 characters** (145–158c). The empty-wardrobe fit cards showed the same improvement, dropping from 327–393 characters down to 139–156 characters, with zero regressions on Criteria 1, 2, 3, or 5.
 
 ---
 
@@ -463,7 +467,7 @@ In `mcp_server.py`, I uncommented the `@mcp.tool()` wrapper for `search_listings
      you did. "I ran out of time" is fine if it's true. Pretending nothing is
      left is not. -->
 
-
+While all five acceptance criteria now pass (5/5), the prompt change in `tools.py::create_fit_card` overcorrected on length: aiming for `"strictly under 240 characters"` and `"2 short, punchy sentences"` compressed the captions all the way down to ~140–158 characters, leaving roughly 120 characters of unused room below the 280-character X limit and losing some of the richer styling commentary from the initial run. Additionally, across independent tries, the model also defaults to opening almost every caption with `"Scored this..."` (`4 of 5` in the matching query and `5 of 5` in the empty wardrobe run). If I were to iterate further, I would further tune the prompt target to a looser range (e.g., `"between 200 and 260 characters, in 2–3 sentences"`) and experiment with the prompt to try and coax out more varied hooks for each run. I stopped here because the single change cleanly resolved Criterion 4 without introducing regressions.
 
 <!-- ═════════════════════════════════════════════════════════════════════
 
