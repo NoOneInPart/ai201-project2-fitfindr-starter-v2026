@@ -242,17 +242,99 @@ Nothing beats the effortless 90s off-duty model vibe of these Vintage Levi's 501
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Matching query completes all three tools | 4/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Impossible query stops before the second tool | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. `session["selected_item"]["id"]` matches `session["search_results"][0]["id"]` with all fields intact | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card captions include both platform name and item price | 4/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. Empty wardrobe query completes and returns fit card with general styling advice | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
 **Real output from one try**, pasted as text, naming the file and function
 that produced it:
 
-```
+```text
+=== Criterion 1: Matching query completes all three tools ===
+Produced by: run_eval.py::main -> agent.py::run_agent (Try 1, query: "vintage graphic tee under $30")
 
+- stopped early: no
+- selected_item: Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+- search_results: 10
+
+[1] parse_query
+      in:  vintage graphic tee under $30
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey, Y2K Baby Tee — Butterfly Print … +7 more
+      →    branch: found 10 items — selected 'Graphic Tee — 2003 Tour Bootleg Style'
+[3] suggest_outfit
+      in:  dict with keys: item, wardrobe_items
+      out: Hey there! As your FitFindr stylist, I am so excited about this find. A 2003 tour bootleg tee is the holy grai…
+      →    matched with user wardrobe
+[4] create_fit_card
+      in:  dict with keys: item
+      out: Scored the ultimate 2003 tour bootleg style graphic tee for just $24.00 on depop, and I am officially obsessed…
+
+
+=== Criterion 2: Impossible query stops before the second tool ===
+Produced by: run_eval.py::main -> agent.py::run_agent (Try 1, query: "designer ballgown size XXS under $5")
+
+- stopped early: yes — No listings found matching 'designer ballgown'. Try adjusting or removing your price limit (currently $5), checking other sizes instead of XXS, or broadening your search terms.
+- selected_item: (none)
+- search_results: 0
+
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+      →    branch: 0 results — stopping early, skipping suggest_outfit and create_fit_card
+
+
+=== Criterion 3: State integrity (selected_item matches search_results[0]) ===
+Produced by: agent.py::run_agent & trace.py::step (Try 1, query: "vintage graphic tee under $30")
+
+- selected_item: Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+- search_results: 10
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey, Y2K Baby Tee — Butterfly Print … +7 more
+      →    branch: found 10 items — selected 'Graphic Tee — 2003 Tour Bootleg Style'
+[3] suggest_outfit
+      in:  dict with keys: item, wardrobe_items
+      out: Hey there! As your FitFindr stylist, I am so excited about this find. A 2003 tour bootleg tee is the holy grai…
+
+
+=== Criterion 4: Fit card captions include both platform name and item price ===
+Produced by: tools.py::create_fit_card via agent.py::run_agent (Try 1, query: "vintage graphic tee under $30")
+
+Scored the ultimate 2003 tour bootleg style graphic tee for just $24.00 on depop, and I am officially obsessed with this find! Whether you lean into effortless 90s grunge with baggy denim or mix high-low vibes by tucking it into tailored khaki trousers, this lived-in piece instantly anchors any outfit with authentic edge ✨. Which styling vibe are we wearing today?
+
+
+=== Criterion 5: Empty wardrobe query completes with general styling advice ===
+Produced by: tools.py::suggest_outfit & tools.py::create_fit_card via agent.py::run_agent (Try 1, query: "denim jacket under $50", wardrobe: empty)
+
+- stopped early: no
+- selected_item: Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+- search_results: 7
+
+Outfit suggestion (tools.py::suggest_outfit):
+Hey there! I’m your FitFindr stylist. That vintage Wrangler cropped jacket is an absolute goldmine—light wash denim is endlessly versatile, and the structured shoulders give it that cool, effortless edge. 
+
+Since you’re building your wardrobe from scratch, this piece makes the ultimate anchor. Here are two versatile ways to style it using everyday staples:
+
+### Look 1: Off-Duty Streetwear (Casual & Cool)
+* **The Base:** A fitted ribbed white tank top and high-waisted black straight-leg jeans.
+* **The Footwear:** Classic white canvas sneakers (like Converse or Veja).
+* **The Vibe:** Effortless, high-contrast, and timeless. The cropped cut of the jacket naturally accentuates your waist against the high-rise denim, while the black-and-white base lets the light-wash blue pop. 
+
+### Look 2: Elevated Casual (Smart-Yet-Relaxed)
+* **The Base:** An oversized neutral crewneck sweater (in oatmeal, grey, or beige) layered underneath, paired with relaxed-fit trousers or slip-on midi skirt.
+* **The Footwear:** Retro leather trainers or black ankle boots.
+* **The Vibe:** Texture play. Layering the boxy jacket over a softer knit adds dimension and makes it wearable even on cooler days.
+
+Fit card (tools.py::create_fit_card):
+Scored this absolute vintage goldmine on poshmark for just $42.00, and this Denim Jacket — Light Wash, Cropped is officially my new wardrobe anchor! I love pairing its structured shoulders and effortless edge with a crisp white tank and high-rise black straight-leg jeans for that ultimate off-duty streetwear vibe. ✨ So obsessed with how the light-wash blue pops against high-contrast basics!
 ```
 
 ---
