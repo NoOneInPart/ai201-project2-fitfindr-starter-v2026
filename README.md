@@ -245,7 +245,7 @@ Nothing beats the effortless 90s off-duty model vibe of these Vintage Levi's 501
 | 1. Matching query completes all three tools | 4/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 | 2. Impossible query stops before the second tool | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 | 3. `session["selected_item"]["id"]` matches `session["search_results"][0]["id"]` with all fields intact | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
-| 4. Fit card includes platform + price and stays ≤ 280 chars (revised) | 4/5 | FAIL (347c) | FAIL (426c) | FAIL (343c) | FAIL (327c) | FAIL (373c) | MISSED (0/5) |
+| 4. Fit card includes platform + price and stays ≤ 280 chars (revised) | 4/5 | FAIL (366c) | FAIL (446c) | FAIL (345c) | FAIL (346c) | FAIL (384c) | MISSED (0/5) |
 | 5. Empty wardrobe query completes and returns fit card with general styling advice | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
 **Real output from one try**, pasted as text, naming the file and function
@@ -305,7 +305,7 @@ Produced by: agent.py::run_agent & trace.py::step (Try 1, query: "vintage graphi
       out: Hey there! As your FitFindr stylist, I am so excited about this find. A 2003 tour bootleg tee is the holy grai…
 
 
-=== Criterion 4: Fit card includes platform + price and stays ≤ 280 chars (FAIL: 347 chars) ===
+=== Criterion 4: Fit card includes platform + price and stays ≤ 280 chars (FAIL: 366 chars) ===
 Produced by: tools.py::create_fit_card via agent.py::run_agent (Try 1, query: "vintage graphic tee under $30")
 
 Scored the ultimate 2003 tour bootleg style graphic tee for just $24.00 on depop, and I am officially obsessed with this find! Whether you lean into effortless 90s grunge with baggy denim or mix high-low vibes by tucking it into tailored khaki trousers, this lived-in piece instantly anchors any outfit with authentic edge ✨. Which styling vibe are we wearing today?
@@ -362,14 +362,14 @@ Scored this absolute vintage goldmine on poshmark for just $42.00, and this Deni
 | 1 | Matching query completes all three tools | 4/5 | MET (5/5) | Checked the trace and output for all 5 tries of `"vintage graphic tee under $30"`; none stopped early and all 5 completed step `[4] create_fit_card`. |
 | 2 | Impossible query stops before the second tool | 5/5 | MET (5/5) | Checked all 5 tries of `"designer ballgown size XXS under $5"`; all 5 stopped at step `[2] search_listings (via MCP)` with 0 results and returned actionable filter suggestions without calling `suggest_outfit`. |
 | 3 | `session["selected_item"]["id"]` matches `session["search_results"][0]["id"]` with all fields intact | 5/5 | MET (5/5) | Verified in the trace and session output that the top search result (`Graphic Tee — 2003 Tour Bootleg Style`, `$24.0`, `depop`) was identically preserved in `session["selected_item"]` and passed into `suggest_outfit` across all 5 tries. |
-| 4 | Fit card captions include platform + price and stay ≤ 280 chars (revised) | 4/5 | MISSED (0/5) | Checked all 5 fit cards; while all 5 included `"depop"` and `"$24.00"`, measuring character length showed all 5 exceeded the 280-character limit (347, 426, 343, 327, and 373 characters). |
+| 4 | Fit card captions include platform + price and stay ≤ 280 chars (revised) | 4/5 | MISSED (0/5) | Checked all 5 fit cards; while all 5 included `"depop"` and `"$24.00"`, measuring character length showed all 5 exceeded the 280-character limit (366, 446, 345, 346, and 384 characters). |
 | 5 | Empty wardrobe query completes and returns fit card with general styling advice | 5/5 | MET (5/5) | Checked all 5 tries of `"denim jacket under $50"` with an empty wardrobe; `suggest_outfit` hit the empty wardrobe fallback branch every time and `create_fit_card` produced a complete caption in 5 of 5 tries. |
 
 **Diagnoses**
 
 - **Criterion 4 (MISSED — 0/5):**
   - **Where it failed:** A tool (`tools.py::create_fit_card`, step `[4]`) and the model's output.
-  - **Mechanism:** The fit card criterion missed on 5 of 5 tries because the prompt in `tools.py::create_fit_card` asks the model for *"2-4 sentences"* and feeds in the entire multi-paragraph `outfit` suggestion from `suggest_outfit`. With no character ceiling in the prompt, the model tries to summarize both Look 1 and Look 2 into three long sentences, producing captions between 327 and 426 characters (averaging 363 characters) that would be truncated on X/Twitter. The tool pipeline and session state worked properly; the prompt simply gave a vague sentence-count guideline (`2-4 sentences`) instead of an explicit character constraint (`<= 280 characters`).
+  - **Mechanism:** The fit card criterion missed on 5 of 5 tries because the prompt in `tools.py::create_fit_card` asks the model for *"2-4 sentences"* and feeds in the entire multi-paragraph `outfit` suggestion from `suggest_outfit`. With no character ceiling in the prompt, the model tries to summarize both Look 1 and Look 2 into three long sentences, producing captions between 345 and 446 characters (averaging 377 characters) that would be truncated on X/Twitter. The tool pipeline and session state worked properly; the prompt simply gave a vague sentence-count guideline (`2-4 sentences`) instead of an explicit character constraint (`<= 280 characters`).
 
 
 
