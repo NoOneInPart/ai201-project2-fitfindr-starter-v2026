@@ -84,6 +84,9 @@ Fit card captions explicitly include both the platform name and item price in 4 
 **Why this target:**
 Tool prompts should explicitly instruct the model to include both the platform name and item price in the returned result, but due to the non-deterministic nature of LLMs, 4 out of 5 allows the small models used to accidentally drop one or more of these parts since it isn't explicitly a problem with the code.
 
+> **Revised in unit 4:** Fit card captions explicitly include both the platform name and item price, and stay within 280 characters (standard X/Twitter post limit) in at least 4 of 5 runs.
+>
+> **Why revised:** The original criterion worked too well (5/5 passes right away) because the prompt already explicitly injected the price and platform, making it too easy to pass while ignoring whether the caption was actually short enough to post on social media (all 5 initial tries were 327–426 characters long, which would get cut off on X/Twitter).
 
 ---
 
